@@ -78,8 +78,10 @@ router.get("/:id", async (req, res) => {
 //. Update user
 router.put("/", async (req, res) => {
     // const { id } = req.params;
-    console.log(req.user);
     const { name, username } = req.body;
+    if (!req.user) {
+        return res.status(401).json({ "error": "Unauthorized" });
+    }
     try {
         const result = await prisma.user.update({
             where: { id: req.user },
@@ -94,6 +96,9 @@ router.put("/", async (req, res) => {
 //. Delete user
 router.delete("/", async (req, res) => {
     // const { id } = req.params;
+    if (!req.user) {
+        return res.status(401).json({ "error": "Unauthorized" });
+    }
     try {
         const tweets = await prisma.tweet.findFirst({ where: { userID: req.user } });
         if (tweets) {

@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction} from "express";
+import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
 
@@ -17,7 +17,7 @@ declare global {
 }
 
 //. Handler to verify jwt token
-export async function verifyToken(req: Request, res: Response, next: NextFunction){
+export async function verifyToken(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers["authorization"];
     const jwtToken = authHeader?.split(" ")[1];
     if (!jwtToken) {
@@ -39,11 +39,11 @@ export async function verifyToken(req: Request, res: Response, next: NextFunctio
         }
         // res.locals.user = dbToken.user;
         req.user = dbToken.user.id;
-        next();
     } catch (error) {
         console.log(error);
         return res.json({ "error": "See console !" });
     }
+    next();
 }
 
 export default Request

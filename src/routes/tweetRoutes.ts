@@ -9,6 +9,9 @@ const prisma = new PrismaClient();
 //. Create Tweet
 router.post("/", async (req, res) => {
     const { content } = req.body;
+    if (!req.user) {
+        return res.status(401).json({ "error": "Unauthorized" });
+    }
     const once = req.user;
     try {
         const newTweet = await prisma.tweet.create({
@@ -29,6 +32,9 @@ router.get("/user/all", async (req, res) => {
     try {
         // We can also include user object(or only some information) from whom the tweet is related 
         // (with userID and tweet relation defined in schema)
+        if (!req.user) {
+            return res.status(401).json({ "error": "Unauthorized" });
+        }
         const alltweets = await prisma.tweet.findMany({
             where: {
                 userID: req.user
@@ -88,6 +94,9 @@ router.get("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
     const { id } = req.params;
     const { content } = req.body;
+    if (!req.user) {
+        return res.status(401).json({ "error": "Unauthorized" });
+    }
     try {
         const checkID = await prisma.tweet.findUnique({
             where: {
@@ -112,6 +121,9 @@ router.put("/:id", async (req, res) => {
 //. Delete Tweet
 router.delete("/:id", async (req, res) => {
     const { id } = req.params;
+    if (!req.user) {
+        return res.status(401).json({ "error": "Unauthorized" });
+    }
     try {
         const checkID = await prisma.tweet.findUnique({
             where: {
