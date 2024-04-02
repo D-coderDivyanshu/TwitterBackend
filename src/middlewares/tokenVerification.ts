@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, Router } from "express";
+import { Request, Response, NextFunction} from "express";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
 
@@ -46,4 +46,4 @@ export async function verifyToken(req: Request, res: Response, next: NextFunctio
     }
 }
 
-export default Router
+export default Request

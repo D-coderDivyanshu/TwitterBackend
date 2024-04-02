@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { PrismaClient } from "@prisma/client";
+import req from "../middlewares/tokenVerification"
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -26,14 +27,20 @@ router.post("/", async (req, res) => {
         }
     } catch (error) {
         console.log(error);
-        res.json({"error": "See console"});
+        res.json({ "error": "See console" });
     }
 });
 
 //. List users
 router.get("/all", async (req, res) => {
     try {
-        const allUsers = await prisma.user.findMany();
+        const allUsers = await prisma.user.findMany({
+            select: {
+                name: true,
+                username: true,
+                image: true
+            }
+        });
         // Handling empty variable
         if (!allUsers) {
             res.send({ "error": "Empty user collection" });
@@ -52,6 +59,11 @@ router.get("/:id", async (req, res) => {
             where: {
                 id: id
             },
+            select: {
+                name: true,
+                username: true,
+                image: true
+            }
         });
         // Handling empty variable
         if (!user) {
@@ -64,28 +76,35 @@ router.get("/:id", async (req, res) => {
 });
 
 //. Update user
-router.put("/:id", async (req, res) => {
-    const { id } = req.params;
+router.put("/", async (req, res) => {
+    // const { id } = req.params;
+    console.log(req.user);
     const { name, username } = req.body;
     try {
         const result = await prisma.user.update({
-            where: { id: id },
+            where: { id: req.user },
             data: { name, username },
         })
         res.json(result);
     } catch (error) {
-        res.status(400).json({ "error": `Not updated : ${id}` });
+        res.status(400).json({ "error": `Not updated !` });
     }
 });
 
 //. Delete user
-router.delete("/:id", async (req, res) => {
-    const { id } = req.params;
+router.delete("/", async (req, res) => {
+    // const { id } = req.params;
     try {
-        await prisma.user.delete({ where: { id : id } });
-        res.status(201).send("Succesfull deletion");
+        const tweets = await prisma.tweet.findFirst({ where: { userID: req.user } });
+        if (tweets) {
+            await prisma.tweet.deleteMany({ where: { userID: req.user } })
+        }
+        await prisma.token.delete({ where: { userID: req.user } });
+        await prisma.user.delete({ where: { id: req.user } });
+        res.status(201).json({ "status": "Successful deletion" });
     } catch (error) {
         console.log(error);
     }
 });
+
 export default router;

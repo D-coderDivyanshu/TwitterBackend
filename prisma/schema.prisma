@@ -28,7 +28,7 @@ model Token {
   emailToken String?   @unique
   valid      Boolean  @default(true)
   expiration DateTime
-  userID     String   @db.ObjectId
+  userID     String   @db.ObjectId @unique
   user       User     @relation(fields: [userID], references: [id])
 }
 
@@ -39,6 +39,6 @@ model Tweet {
   content     String
   image       String?
   impressions Int      @default(0)
-  userID      String   @db.ObjectId // This is for relation between Tweet and User
+  userID      String   @db.ObjectId @unique// This is for relation between Tweet and User
   user        User     @relation(fields: [userID], references: [id])
 }
